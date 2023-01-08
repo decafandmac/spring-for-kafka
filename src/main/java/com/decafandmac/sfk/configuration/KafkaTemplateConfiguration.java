@@ -1,0 +1,39 @@
+package com.decafandmac.sfk.configuration;
+
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration
+public class KafkaTemplateConfiguration {
+
+    /**
+     * KafkaAutoConfiguration 에 kafkaTemplate 이 미리 정의되어 있지만,
+     * @ConditionalOnMissingBean annotation 때문에 동일한 이름으로 재정의 하더라도 문제가 없음
+     */
+    @Bean
+    public KafkaTemplate<String, String> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+
+    private ProducerFactory<String, String> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerProps());
+    }
+
+    private Map<String, Object> producerProps() {
+        Map<String, Object> props = new HashMap<>();
+
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+
+        return props;
+    }
+}
